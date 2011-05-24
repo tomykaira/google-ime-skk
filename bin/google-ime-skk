@@ -1,4 +1,5 @@
-#!/usr/bin/env ruby -Ku
+#!/usr/bin/env ruby
+$KCODE="UTF8"
 
 self_file =
   if File.symlink?(__FILE__)
