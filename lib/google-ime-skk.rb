@@ -25,11 +25,15 @@ class GoogleImeSkk < SocialSKK
   end
 
   def social_ime_search(text)
+    # listen to local ime
     text = encode_to_utf8(text)
     text = text.sub(/[a-z]?$/) { |m| ',' + m }
     uri = URI.parse 'http://www.google.com/transliterate'
-    http = Net::HTTP.new(uri.host, uri.port)
-    http = Net::HTTP.new(uri.host, uri.port, @proxy.host, @proxy.port) if @proxy
+    http = if @proxy
+             Net::HTTP.new(uri.host, uri.port, @proxy.host, @proxy.port)
+           else
+             Net::HTTP.new(uri.host, uri.port)
+           end
     begin
       http.read_timeout = 1
       http.open_timeout = 1

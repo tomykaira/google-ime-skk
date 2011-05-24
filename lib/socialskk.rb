@@ -1,3 +1,4 @@
+require "socket"
 require "thread"
 require 'socket'
 require 'uri'
@@ -23,6 +24,8 @@ class SocialSKK
   BUFSIZE    = 512
   TIMEOUT    = 10
 
+  LOCAL_SERVERS = [["localhost", "skkserv"]]
+
   def initialize(host, port, proxy, cache_time, cache=nil)
     @host  = host
     @port  = port
@@ -43,24 +46,7 @@ class SocialSKK
           when CLIENT_END
             break
           when CLIENT_REQUEST
-            cmdend = cmdbuf.index(?\ ) || cmdbuf.index(?\n)
-            kana = cmdbuf[1 .. (cmdend - 1)]
-            ret = ''
-            begin
-              if kanji = search(kana)
-                ret.concat(SERVER_FOUND)
-                ret.concat('/')
-                ret.concat(kanji)
-              else
-                ret.concat(SERVER_NOT_FOUND)
-                ret.concat(cmdbuf[1 .. -1])
-              end
-              ret.concat("\n")
-            rescue Exception
-              ret.concat(SERVER_ERROR)
-              ret.concat($!)
-            end
-            s.write(ret)
+            s.write( search_others(cmdbuf) || search_social(cmdbuf) )
           when CLIENT_VERSION
             s.write(VERSION_STRING)
           when CLIENT_HOST
@@ -86,6 +72,7 @@ class SocialSKK
   end
 
   def search(kana)
+    p "search:" + kana
     if @cache[kana] and Time.now < (@cache[kana][:ctime] + @cache_time)
       @cache[kana][:kanji]
     else
@@ -94,7 +81,52 @@ class SocialSKK
         :kanji => kanji,
         :ctime => Time.now
       }
+      p "search:" + kanji
       kanji
+    end
+  end
+
+  # tested with dbskkd-cdb
+  def search_others(buf)
+    LOCAL_SERVERS.each do |serv|
+      TCPSocket.open(serv[0], serv[1]) do |skk|
+        skk.write(buf)
+        res = skk.gets # remove \n
+        case res[0]
+        when SERVER_FOUND
+          puts "found in local server", res
+          return res
+        when SERVER_NOT_FOUND
+          puts "NOT found in local server"
+          next
+        else
+          p "must not here ",res
+          next
+        end
+      end
+    end
+    return nil
+  end
+
+  def search_social(buf)
+    cmdend = buf.index(?\ ) || buf.index(?\n)
+    kana = buf[1 .. (cmdend - 1)]
+    ret = ''
+    begin
+      if kanji = search(kana)
+        puts "found in remote server", kanji
+        ret.concat(SERVER_FOUND)
+        ret.concat('/')
+        ret.concat(kanji)
+      else
+        puts "NOT found in remote server"
+        ret.concat(SERVER_NOT_FOUND)
+        ret.concat(buf[1 .. -1])
+      end
+      ret.concat("\n")
+    rescue Exception
+      ret.concat(SERVER_ERROR)
+      ret.concat($!)
     end
   end
 
