@@ -72,7 +72,6 @@ class SocialSKK
   end
 
   def search(kana)
-    p "search:" + kana
     if @cache[kana] and Time.now < (@cache[kana][:ctime] + @cache_time)
       @cache[kana][:kanji]
     else
@@ -81,7 +80,6 @@ class SocialSKK
         :kanji => kanji,
         :ctime => Time.now
       }
-      p "search:" + kanji
       kanji
     end
   end
@@ -94,13 +92,10 @@ class SocialSKK
         res = skk.gets # remove \n
         case res[0]
         when SERVER_FOUND
-          puts "found in local server", res
           return res
         when SERVER_NOT_FOUND
-          puts "NOT found in local server"
           next
         else
-          p "must not here ",res
           next
         end
       end
@@ -114,12 +109,10 @@ class SocialSKK
     ret = ''
     begin
       if kanji = search(kana)
-        puts "found in remote server", kanji
         ret.concat(SERVER_FOUND)
         ret.concat('/')
         ret.concat(kanji)
       else
-        puts "NOT found in remote server"
         ret.concat(SERVER_NOT_FOUND)
         ret.concat(buf[1 .. -1])
       end
