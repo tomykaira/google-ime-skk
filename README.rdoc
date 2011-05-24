@@ -1,6 +1,16 @@
 = google-ime-skk
 
-Google IME SKK Server
+Google IME SKK Server (Extended)
+
+自分がいままでつかっていた SKK Server とあわせて利用できます。
+複数の SKK Server を使っている方はすくないかとおもいますが、複数指定もできるはずです。
+指定は lib/socialskk.rb をひらいて、 LOCAL_SERVERS に追記してください。
+    LOCAL_SERVERS = [["ServAddr1", "ServPort1"],
+                     ["ServAddr2","ServPort2"], ...]
+
+Fail Through なので、ひとつのサーバから応答があれば、それ以降のサーバにはリクエストしません。
+これにより、特殊単語以外をローカルで検索することができ、応答速度が向上します。
+ただし、ローカルのリクエストはキャッシュしないので、実はおそいかもしれません。
 
 == Run:
 
@@ -17,3 +27,5 @@ Google IME SKK Server
 
 Copyright (c) 2011 hitode909. See LICENSE.txt for
 further details.
+
+Modified by tomykaira (2011).
