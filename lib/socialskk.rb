@@ -89,7 +89,7 @@ class SocialSKK
     LOCAL_SERVERS.each do |serv|
       TCPSocket.open(serv[0], serv[1]) do |skk|
         skk.write(buf)
-        res = skk.gets # remove \n
+        res = skk.gets
         case res[0]
         when SERVER_FOUND
           return res
