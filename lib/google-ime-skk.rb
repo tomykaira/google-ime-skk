@@ -41,7 +41,7 @@ class GoogleImeSkk < SocialSKK
       http.start do |h|
         res = h.get("/transliterate?langpair=ja-Hira%7Cja&text=" + URI.escape(text))
         obj = JSON.parse(res.body.to_s)
-        encode_to_eucjp(obj[0][1].map{|s| s =~ /^(([ァ-ヾ]+)|([ぁ-ゞ]+)|([ｦ-ﾟ]+)|([a-zA-Z]+))$/ ? nil : s }.compact.join('/'))
+        encode_to_eucjp(obj[0][1].map{|s| s =~ /^(([ァ-ヾ]+)|([ぁ-ゞ]+)|([ｦ-ﾟ]+)|([a-zA-Z]+))$/ ? nil : s + '/' }.compact.join)
       end
     rescue => e
       warn e
