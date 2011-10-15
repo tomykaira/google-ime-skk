@@ -41,7 +41,12 @@ class GoogleImeSkk < SocialSKK
       http.start do |h|
         res = h.get("/transliterate?langpair=ja-Hira%7Cja&text=" + URI.escape(text))
         obj = JSON.parse(res.body.to_s)
-        encode_to_eucjp(obj[0][1].map{|s| s =~ /^(([ァ-ヾ]+)|([ぁ-ゞ]+)|([ｦ-ﾟ]+)|([a-zA-Z]+))$/ ? nil : s + '/' }.compact.join)
+        candidates = obj[0][1].find_all{|s| s !~ /^(([ァ-ヾ]+)|([ぁ-ゞ]+)|([ｦ-ﾟ]+)|([a-zA-Z]+))$/}
+        unless candidates.empty?
+          # A/B/C/D/
+          # http://code.google.com/p/dbskkd-cdb/source/browse/trunk/skk-server-protocol.txt
+          encode_to_eucjp(candidates.join('/') + '/')
+        end
       end
     rescue => e
       warn e
