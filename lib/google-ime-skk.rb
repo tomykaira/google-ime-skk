@@ -52,8 +52,7 @@ class GoogleImeSkk < SocialSKK
       end
     rescue => e
       @logger.fatal e
-      @logger.fatal $@
-      return ""
+      encode_to_eucjp(text)
     end
   end
 end
