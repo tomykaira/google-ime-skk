@@ -35,9 +35,10 @@ class SocialSKK
     @cache = cache || {}
     @cache_time = cache_time
     @ts = TCPServer.open(@host, @port)
-    puts "server is on #{@ts.addr[1..-1].join(":")}"
-    puts "proxy is #{@proxy.to_s}" if @proxy
-    puts "cache keep time #{@cache_time}sec"
+    info = "server is on #{@ts.addr[1..-1].join(":")}\n"
+    info += "proxy is #{@proxy.to_s}\n" if @proxy
+    info += "cache keep time #{@cache_time}sec"
+    @logger.info info
   end
 
   def mainloop
