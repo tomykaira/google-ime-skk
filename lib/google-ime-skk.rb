@@ -26,8 +26,9 @@ class GoogleImeSkk < SocialSKK
   end
 
   def social_ime_search(text)
-    # listen to local ime
     text = encode_to_utf8(text)
+    @logger.info "Searching #{text}"
+    # listen to local ime
     text = text.sub(/[a-z]?$/) { |m| ',' + m }
     uri = URI.parse 'http://www.google.com/transliterate'
     http = if @proxy
@@ -42,6 +43,7 @@ class GoogleImeSkk < SocialSKK
         res = h.get("/transliterate?langpair=ja-Hira%7Cja&text=" + URI.escape(text))
         obj = JSON.parse(res.body.to_s)
         candidates = obj[0][1].find_all{|s| s !~ /^(([ァ-ヾ]+)|([ぁ-ゞ]+)|([ｦ-ﾟ]+)|([a-zA-Z]+))$/}
+        @logger.info "Candidates #{candidates}"
         unless candidates.empty?
           # A/B/C/D/
           # http://code.google.com/p/dbskkd-cdb/source/browse/trunk/skk-server-protocol.txt
@@ -49,10 +51,9 @@ class GoogleImeSkk < SocialSKK
         end
       end
     rescue => e
-      warn e
+      @logger.fatal e
+      @logger.fatal $@
       return ""
     end
   end
 end
-
-

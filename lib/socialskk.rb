@@ -5,6 +5,7 @@ require 'uri'
 require 'net/http'
 require 'timeout'
 require 'yaml'
+require 'logger'
 
 # http://coderepos.org/share/browser/lang/ruby/misc/socialskk/socialskk.rb
 
@@ -26,9 +27,10 @@ class SocialSKK
 
   LOCAL_SERVERS = [["localhost", "skkserv"]]
 
-  def initialize(host, port, proxy, cache_time, cache=nil)
+  def initialize(host, port, log, proxy, cache_time, cache=nil)
     @host  = host
     @port  = port
+    @logger = Logger.new(log)
     @proxy = proxy
     @cache = cache || {}
     @cache_time = cache_time

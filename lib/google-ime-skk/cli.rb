@@ -24,6 +24,7 @@ module GoogleImeSkk::CLI
         :host   => '0.0.0.0',
         :proxy  => nil,
         :cache_time => 3600,
+        :log => STDOUT
       })
 
     OptionParser.new do |parser|
@@ -44,12 +45,15 @@ module GoogleImeSkk::CLI
         on('-c', '--cache-time 1h', 'Cache keep time') do |ct|
           opts.cache_time = GoogleImeSkk::CLI.time_parse(ct)
         end
+        on('-l', '--log ~/gskk.log', 'Log file') do |log|
+          opts.log = log
+        end
 
         parse!(ARGV)
       end
     end
 
-    ime = GoogleImeSkk.new(opts.host, opts.port, opts.proxy, opts.cache_time)
+    ime = GoogleImeSkk.new(opts.host, opts.port, opts.log, opts.proxy, opts.cache_time)
     ime.mainloop
   end
 end
